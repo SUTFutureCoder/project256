@@ -62,9 +62,6 @@ func GetListByUser(userId string) (*[]WishStruct, error){
 	// 初始化结构
 	var wishData WishStruct
 	var wishDataList []WishStruct
-	if ret.Next() == false {
-		return &wishDataList, nil
-	}
 	for ret.Next() {
 		err = ret.Scan(&wishData.Id, &wishData.WishId, &wishData.ParentWishId, &wishData.WishContent, &wishData.Status, &wishData.CreateUser, &wishData.CreateTime, &wishData.UpdateTime)
 		if err != nil {

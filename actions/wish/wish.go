@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"project256/util"
 	"project256/models/wish"
+	"project256/models/feed"
 )
 
 func WishList() (func(*gin.Context)) {
@@ -41,6 +42,7 @@ func MakeAWish() (func(*gin.Context)) {
 			util.Exception(c, util.ERROR_DB_INSERT, err.Error())
 			if c.IsAborted() {return}
 		}
+		feed.AddFeed(&data, util.TYPE_WISH)
 		util.Output(c)
 	}
 }

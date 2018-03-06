@@ -13,8 +13,6 @@ func main() {
 	r := gin.Default()
 	sessStore, _ := sessions.NewRedisStore(10, "tcp", "localhost:6379", "")
 	r.Use(sessions.Sessions("project256", sessStore))
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery())
 
 	essayRouter := r.Group("/essay", actions.ActionBase())
 	essayRouter.GET("/list/:user_id",  essay.EssayList())
@@ -25,7 +23,7 @@ func main() {
 	wishRouter.POST("/make", wish.MakeAWish())
 
 	feedRouter := r.Group("/feed", actions.ActionBase())
-	feedRouter.GET("/list", feed.FeedList())
+	feedRouter.GET("/", feed.FeedList())
 
 	r.Run(":3001")
 }

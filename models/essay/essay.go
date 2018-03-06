@@ -45,7 +45,7 @@ func InsertEssay(essayData *map[string]interface{}) (int64, error) {
 	return row, err
 }
 
-func GetListByUser(userId string, offset, limit int) (*[]EssayStruct, error){
+func GetListByUser(userId, limit, offset string) (*[]EssayStruct, error){
 	db := models.GetDbConn()
 	ret, err := db.Query("SELECT * FROM essay WHERE create_user=? ORDER BY id DESC LIMIT ? OFFSET ?",
 			userId,
@@ -66,9 +66,6 @@ func GetListByUser(userId string, offset, limit int) (*[]EssayStruct, error){
 	// 初始化结构
 	var essayData EssayStruct
 	var essayDataList []EssayStruct
-	if ret.Next() == false {
-		return &essayDataList, nil
-	}
 	for ret.Next() {
 		err = ret.Scan(&essayData.Id, &essayData.EssayId, &essayData.EssayTitle, &essayData.EssayContent, &essayData.WishId, &essayData.Status, &essayData.CreateUser, &essayData.CreateTime, &essayData.UpdateTime)
 		if err != nil {
