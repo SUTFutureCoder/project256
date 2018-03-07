@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"project256/util"
 	//"project256/models/essay"
+	"project256/models/essay"
 )
 
 func EssayList() (func(*gin.Context)) {
@@ -37,7 +38,8 @@ func AddEssay() (func(*gin.Context)) {
 			if c.IsAborted() {return}
 		}
 
-		util.Output(c, nil)
+		essay.InsertEssay(&data)
+		util.Output(c)
 	}
 }
 

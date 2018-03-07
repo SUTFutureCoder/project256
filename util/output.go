@@ -5,13 +5,21 @@ import (
 	"net/http"
 )
 
-func Output(c *gin.Context, resultData interface{}){
+func Output(c *gin.Context, resultData ...interface{}){
 	if resultData != nil {
-		c.AbortWithStatusJSON(http.StatusOK, gin.H{
-			"error_no": 0,
-			"error_msg": "",
-			"result": resultData,
-		})
+		if len(resultData) == 1 {
+			c.AbortWithStatusJSON(http.StatusOK, gin.H{
+				"error_no": 0,
+				"error_msg": "",
+				"result": resultData[0],
+			})
+		} else {
+			c.AbortWithStatusJSON(http.StatusOK, gin.H{
+				"error_no": 0,
+				"error_msg": "",
+				"result": resultData,
+			})
+		}
 	} else {
 		c.AbortWithStatusJSON(http.StatusOK, gin.H{
 			"error_no": 0,
@@ -21,11 +29,11 @@ func Output(c *gin.Context, resultData interface{}){
 	}
 }
 
-func Exception(c *gin.Context, errNo int, errMessage string){
-	if errMessage != "" {
+func Exception(c *gin.Context, errNo int, errMessage ...string){
+	if errMessage[0] != "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error_no": errNo,
-			"error_msg": errMessage,
+			"error_msg": errMessage[0],
 		})
 	} else {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
