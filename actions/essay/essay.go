@@ -9,8 +9,8 @@ import (
 func EssayList() (func(*gin.Context)) {
 	return func(c *gin.Context) {
 		// 获取用户id
-		userId, exist := c.GetQuery("user_id")
-		if exist == false {
+		userId := c.Param("user_id")
+		if userId == "" {
 			// 一期必填，二期则改为推荐
 			util.Exception(c, util.ERROR_PARAM_ERROR, "user_id不能为空")
 			if c.IsAborted() {return}
@@ -31,8 +31,7 @@ func WriteEssay() (func(*gin.Context)) {
 		data := make(map[string]interface{})
 		data["essay_title"], _ = c.GetPostForm("essay_title")
 		data["essay_content"], _ = c.GetPostForm("essay_content")
-		data["wish_id"] = c.DefaultPostForm("wish_id", "0")
-		data["little_wish_id"] = c.DefaultPostForm("little_wish_id", "0")
+		data["wish_id"] = c.DefaultPostForm("wish_id", "")
 		if data["essay_title"] == "" {
 			util.Exception(c, util.ERROR_PARAM_ERROR, "文章标题不能为空")
 			if c.IsAborted() {return}

@@ -7,7 +7,7 @@ import (
 
 func ActionBase() (func(*gin.Context)) {
 	return func(c *gin.Context) {
-		token := c.GetHeader("token")
+		token, _ := c.GetQuery("token")
 		cookie := ""
 		tmpCookie, err := c.Cookie("project256")
 		if err != nil {

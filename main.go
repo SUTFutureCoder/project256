@@ -4,7 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/sessions"
 	"project256/actions/essay"
+	"project256/actions/wish"
 	"project256/actions"
+	"project256/actions/feed"
 )
 
 func main() {
@@ -15,7 +17,15 @@ func main() {
 	r.Use(gin.Recovery())
 
 	essayRouter := r.Group("/essay", actions.ActionBase())
-	essayRouter.GET("/list",  essay.EssayList())
+	essayRouter.GET("/list/:user_id",  essay.EssayList())
 	essayRouter.POST("/write", essay.WriteEssay())
+
+	wishRouter := r.Group("/wish", actions.ActionBase())
+	wishRouter.GET("/list/:user_id", wish.WishList())
+	wishRouter.POST("/make", wish.MakeAWish())
+
+	feedRouter := r.Group("/feed", actions.ActionBase())
+	feedRouter.GET("/list", feed.FeedList())
+
 	r.Run(":3001")
 }
