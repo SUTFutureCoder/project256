@@ -9,7 +9,7 @@ import (
 
 func GetConfig(section string) (map[string]string, error) {
 	dir, _ := os.Getwd()
-	confDir := dir + "/conf/store.ini"
+	confDir := dir + "/conf/store_online.ini"
 	cfg, err := ini.Load(confDir)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("conf load error: %s", err))

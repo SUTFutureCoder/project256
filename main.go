@@ -16,6 +16,6 @@ func main() {
 
 	essayRouter := r.Group("/essay", actions.ActionBase())
 	essayRouter.GET("/list",  essay.EssayList())
-	essayRouter.POST("/add", essay.AddEssay())
+	essayRouter.POST("/write", essay.WriteEssay())
 	r.Run(":3001")
 }

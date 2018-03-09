@@ -15,6 +15,7 @@ const ERROR_UUID_MAX          = 108;
 const ERROR_REDIS             = 109;
 const ERROR_FUNC_NON_EXISTS   = 110;
 const ERROR_IP_UNAUTHORIZED   = 111;
+const ERROR_USER_UNAUTHORIZED = 112;
 
 //DB
 const ERROR_DB_CONNECT        = 206;
@@ -39,6 +40,7 @@ func GetErrorMessage (errorNo int) string{
 		ERROR_REDIS:                "redis error",
 		ERROR_FUNC_NON_EXISTS:      "function non exists error",
 		ERROR_IP_UNAUTHORIZED:      "unauthorized IP",
+		ERROR_USER_UNAUTHORIZED:	"unauthorized user",
 
 		ERROR_DB_CONNECT:           "db connect error",
 		ERROR_DB_INSERT:            "db insert error",
