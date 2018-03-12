@@ -19,12 +19,13 @@ type EssayStruct struct {
 	CreateUser	string
 	CreateTime	int64
 	UpdateTime	int64
+	Ext 		map[string]interface{}
 }
 
-func InsertEssay(essayData *map[string]interface{}) (int64, error) {
+func InsertEssay(essayData *map[string]interface{}) (string, error) {
 	user := util.GetUserInfo()
 	if user["status"] == util.STATUS_INVALID {
-		return 0, errors.New(util.GetErrorMessage(util.ERROR_USER_UNAUTHORIZED))
+		return "", errors.New(util.GetErrorMessage(util.ERROR_USER_UNAUTHORIZED))
 	}
 	essayId, err :=util.GenUUID32()
 	db := models.GetDbConn()
@@ -39,10 +40,10 @@ func InsertEssay(essayData *map[string]interface{}) (int64, error) {
 		)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Insert Essay Error: %s", err))
-		return 0, err
+		return "", err
 	}
-	row, _ := ret.RowsAffected()
-	return row, err
+	_, err = ret.RowsAffected()
+	return essayId, err
 }
 
 func GetListByUser(userId, limit, offset string) (*[]EssayStruct, error){

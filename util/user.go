@@ -9,7 +9,7 @@ func CheckUser(token, cookie string) (bool) {
 	if cfg["token"] == token {
 		// 这里写入用户信息
 		userInfo["user_id"] = "1"
-		userInfo["user_name"] = "FutureCoder"
+		userInfo["user_name"] = "*Chen"
 		userInfo["user_sign"] = ""
 		userInfo["status"] = STATUS_VALID
 	} else {

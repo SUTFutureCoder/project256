@@ -7,10 +7,13 @@ import (
 	"project256/actions/wish"
 	"project256/actions"
 	"project256/actions/feed"
+	"project256/util"
 )
 
 func main() {
 	r := gin.Default()
+	r.Use(util.CORSMiddleware())
+
 	sessStore, _ := sessions.NewRedisStore(10, "tcp", "localhost:6379", "")
 	r.Use(sessions.Sessions("project256", sessStore))
 

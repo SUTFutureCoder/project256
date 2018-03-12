@@ -13,11 +13,13 @@ import (
 type FeedStruct struct {
 	Id			int64
 	FeedId		string
+	ReId		string
 	FeedData 	string
 	FeedType 	int
 	Status 		int
 	CreateUser	string
 	CreateTime	int64
+	Ext 		map[string]interface{}
 }
 
 func AddFeed(data *map[string]interface{}, dataType int) {
@@ -25,8 +27,10 @@ func AddFeed(data *map[string]interface{}, dataType int) {
 	feedData["feed_type"] = dataType
 	switch dataType {
 	case util.TYPE_ESSAY:
+		feedData["re_id"]	  = (*data)["essay_id"]
 		feedData["feed_data"] = (*data)["essay_title"]
 	case util.TYPE_WISH:
+		feedData["re_id"]	  = (*data)["wish_id"]
 		feedData["feed_data"] = (*data)["wish_content"]
 	}
 	InsertFeed(&feedData)
@@ -39,8 +43,9 @@ func InsertFeed(feedData *map[string]interface{}) (int64, error) {
 	}
 	feedId, err :=util.GenUUID32()
 	db := models.GetDbConn()
-	ret, err := db.Exec("INSERT INTO feed (feed_id, feed_data, feed_type, status, create_user, create_time) VALUES (?,?,?,?,?,?)",
+	ret, err := db.Exec("INSERT INTO feed (feed_id, re_id, feed_data, feed_type, status, create_user, create_time) VALUES (?,?,?,?,?,?,?)",
 		feedId,
+		(*feedData)["re_id"],
 		(*feedData)["feed_data"],
 		(*feedData)["feed_type"],
 		util.STATUS_VALID,
@@ -84,7 +89,7 @@ func GetFeed(limit, offset string) (*[]FeedStruct, error){
 	var feedData FeedStruct
 	var feedDataList []FeedStruct
 	for ret.Next() {
-		err = ret.Scan(&feedData.Id, &feedData.FeedId, &feedData.FeedData, &feedData.FeedType, &feedData.Status, &feedData.CreateUser, &feedData.CreateTime)
+		err = ret.Scan(&feedData.Id, &feedData.FeedId, &feedData.ReId, &feedData.FeedData, &feedData.FeedType, &feedData.Status, &feedData.CreateUser, &feedData.CreateTime)
 		if err != nil {
 			log.Fatal(fmt.Sprintf("Scan Data Error: %s", err))
 			return nil, err

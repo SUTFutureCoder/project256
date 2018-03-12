@@ -31,6 +31,7 @@ func EssayList() (func(*gin.Context)) {
 
 func WriteEssay() (func(*gin.Context)) {
 	return func(c *gin.Context) {
+		var err error
 		data := make(map[string]interface{})
 		data["essay_title"], _ = c.GetPostForm("essay_title")
 		data["essay_content"], _ = c.GetPostForm("essay_content")
@@ -50,7 +51,7 @@ func WriteEssay() (func(*gin.Context)) {
 			if c.IsAborted() {return}
 		}
 
-		_, err := essay.InsertEssay(&data)
+		data["essay_id"], err = essay.InsertEssay(&data)
 		if err != nil {
 			util.Exception(c, util.ERROR_DB_INSERT, err.Error())
 			if c.IsAborted() {return}

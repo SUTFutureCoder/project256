@@ -29,6 +29,7 @@ func WishList() (func(*gin.Context)) {
 
 func MakeAWish() (func(*gin.Context)) {
 	return func(c *gin.Context) {
+		var err error
 		data := make(map[string]interface{})
 		data["parent_wish_id"] = c.DefaultPostForm("parent_wish_id", "")
 		data["wish_content"], _ = c.GetPostForm("wish_content")
@@ -37,7 +38,7 @@ func MakeAWish() (func(*gin.Context)) {
 			if c.IsAborted() {return}
 		}
 
-		_, err := wish.InsertWish(&data)
+		data["wish_id"], err = wish.InsertWish(&data)
 		if err != nil {
 			util.Exception(c, util.ERROR_DB_INSERT, err.Error())
 			if c.IsAborted() {return}
