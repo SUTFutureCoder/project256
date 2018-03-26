@@ -1,7 +1,6 @@
-package wish
+package models
 
 import (
-	"project256/models"
 	"project256/util"
 	"time"
 	"errors"
@@ -21,13 +20,13 @@ type WishStruct struct {
 	Ext 		map[string]interface{}
 }
 
-func InsertWish(wishData *map[string]interface{}) (string, error) {
+func (w *WishStruct) InsertWish(wishData *map[string]string) (string, error) {
 	user := util.GetUserInfo()
 	if user["status"] == util.STATUS_INVALID {
 		return "", errors.New(util.GetErrorMessage(util.ERROR_USER_UNAUTHORIZED))
 	}
 	wishId, err :=util.GenUUID32()
-	db := models.GetDbConn()
+	db := GetDbConn()
 	ret, err := db.Exec("INSERT INTO wish (wish_id, parent_wish_id, wish_content, status, create_user, create_time) VALUES (?,?,?,?,?,?)",
 		wishId,
 		(*wishData)["parent_wish_id"],
@@ -44,8 +43,8 @@ func InsertWish(wishData *map[string]interface{}) (string, error) {
 	return wishId, err
 }
 
-func GetListByUser(userId string) (*[]WishStruct, error){
-	db := models.GetDbConn()
+func (w *WishStruct) GetListByUser(userId string) (*[]WishStruct, error){
+	db := GetDbConn()
 	ret, err := db.Query("SELECT * FROM wish WHERE create_user=?",
 		userId,
 	)

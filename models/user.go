@@ -1,6 +1,10 @@
-package user
+package models
 
-func GetUserByIds(userIds []string) (map[string]interface{}, error) {
+type UserStruct struct {
+
+}
+
+func (u *UserStruct) GetUserByIds(userIds []string) (map[string]interface{}, error) {
 	// 目前只有一个1号
 	userInfoList := make(map[string]interface{})
 	userInfo := make(map[string]interface{})

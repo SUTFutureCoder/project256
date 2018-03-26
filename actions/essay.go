@@ -1,13 +1,18 @@
-package essay
+package actions
 
 import (
+	"strconv"
 	"github.com/gin-gonic/gin"
 	"project256/util"
-	"project256/models/essay"
-	"project256/models/feed"
+	"project256/models"
 )
 
-func EssayList() (func(*gin.Context)) {
+type Essay struct {
+}
+
+func (e *Essay) EssayList() (func(*gin.Context)) {
+	essay := new(models.EssayStruct)
+	//wish  := new(models.WishStruct)
 	return func(c *gin.Context) {
 		// 获取用户id
 		userId := c.Param("user_id")
@@ -16,23 +21,41 @@ func EssayList() (func(*gin.Context)) {
 			util.Exception(c, util.ERROR_PARAM_ERROR, "user_id不能为空")
 			if c.IsAborted() {return}
 		}
-		limit := c.DefaultQuery("limit", "20")
-		offset := c.DefaultQuery("offset", "0")
-		ret := make(map[string]interface{})
+		curpage, _ := strconv.Atoi(c.DefaultQuery("curpage", "1"))
+		perpage, _ := strconv.Atoi(c.DefaultQuery("perpage", "20"))
+		if perpage > 20 {
+			perpage = 20
+		}
+		if curpage < 1 {
+			curpage = 1
+		}
 		var err error
-		ret["essay_list"], err = essay.GetListByUser(userId, limit, offset)
+		ret, err := essay.GetListByUser(userId, perpage, (curpage - 1) * perpage)
 		if err != nil {
 			util.Exception(c, util.ERROR_DB_SELECT, err.Error())
 			if c.IsAborted() {return}
 		}
+		// 附加心愿数据
+		wishHash := make(map[string]bool)
+		var wishIds []string
+		for _, v := range *ret {
+			if wishHash[v.WishId] == false {
+				wishIds = append(wishIds, v.WishId)
+				wishHash[v.WishId] = true
+			}
+		}
+		// 回写
+		//wishInfoList, err := wish.GetWishByIds(wishIds)
 		util.Output(c, ret)
 	}
 }
 
-func WriteEssay() (func(*gin.Context)) {
+func (e *Essay) WriteEssay() (func(*gin.Context)) {
+	essay := new(models.EssayStruct)
+	feed  := new(models.FeedStruct)
 	return func(c *gin.Context) {
 		var err error
-		data := make(map[string]interface{})
+		data := make(map[string]string)
 		data["essay_title"], _ = c.GetPostForm("essay_title")
 		data["essay_content"], _ = c.GetPostForm("essay_content")
 		data["wish_id"] = c.DefaultPostForm("wish_id", "")
@@ -40,11 +63,9 @@ func WriteEssay() (func(*gin.Context)) {
 			util.Exception(c, util.ERROR_PARAM_ERROR, "文章标题不能为空")
 			if c.IsAborted() {return}
 		}
-		if tmpEssayTitle, ok := data["essay_title"].(string); ok {
-			if len(tmpEssayTitle) > 32 {
-				util.Exception(c, util.ERROR_PARAM_ERROR, "文章标题需要小于32字符")
-				if c.IsAborted() {return}
-			}
+		if len(data["essay_title"]) > 32 {
+			util.Exception(c, util.ERROR_PARAM_ERROR, "文章标题需要小于32字符")
+			if c.IsAborted() {return}
 		}
 		if data["essay_content"] == "" {
 			util.Exception(c, util.ERROR_PARAM_ERROR, "文章内容不能为空")

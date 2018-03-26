@@ -1,13 +1,16 @@
-package wish
+package actions
 
 import (
+	"html"
 	"github.com/gin-gonic/gin"
 	"project256/util"
-	"project256/models/wish"
-	"project256/models/feed"
+	"project256/models"
 )
 
-func WishList() (func(*gin.Context)) {
+type Wish struct{}
+
+func (w *Wish) WishList() (func(*gin.Context)) {
+	wish := new(models.WishStruct)
 	return func(c *gin.Context) {
 		// 获取用户id
 		userId := c.Param("user_id")
@@ -27,16 +30,20 @@ func WishList() (func(*gin.Context)) {
 	}
 }
 
-func MakeAWish() (func(*gin.Context)) {
+func (w *Wish) MakeAWish() (func(*gin.Context)) {
+	wish := new(models.WishStruct)
+	feed := new(models.FeedStruct)
 	return func(c *gin.Context) {
 		var err error
-		data := make(map[string]interface{})
+		data := make(map[string]string)
 		data["parent_wish_id"] = c.DefaultPostForm("parent_wish_id", "")
 		data["wish_content"], _ = c.GetPostForm("wish_content")
 		if data["wish_content"] == "" {
 			util.Exception(c, util.ERROR_PARAM_ERROR, "心愿内容不能为空")
 			if c.IsAborted() {return}
 		}
+
+		data["wish_content"] = html.EscapeString(data["wish_content"])
 
 		data["wish_id"], err = wish.InsertWish(&data)
 		if err != nil {

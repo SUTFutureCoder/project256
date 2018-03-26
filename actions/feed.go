@@ -1,19 +1,26 @@
-package feed
+package actions
 
 import (
+	"strconv"
 	"github.com/gin-gonic/gin"
-	"project256/models/feed"
-	"project256/models/user"
 	"project256/util"
+	"project256/models"
 )
 
-func FeedList() (func(*gin.Context)) {
+type Feed struct {}
+
+func (f *Feed) FeedList() (func(*gin.Context)) {
+	feed := new(models.FeedStruct)
+	user := new(models.UserStruct)
 	return func(c *gin.Context) {
 		// 读取关注动态feed流
 		// 默认读取1feed流，之后用户和关注系统出来后再改
-		limit := c.DefaultQuery("limit", "20")
-		offset := c.DefaultQuery("offset", "0")
-		ret, err := feed.GetFeed(limit, offset)
+		curpage, _ := strconv.Atoi(c.DefaultQuery("curpage", "1"))
+		perpage, _ := strconv.Atoi(c.DefaultQuery("perpage", "20"))
+		if perpage > 20 {
+			perpage = 20
+		}
+		ret, err 		:= feed.GetFeed(perpage, (curpage - 1) * perpage)
 		// 关联查询
 		userIdsHash := make(map[string]bool)
 		var userIds []string

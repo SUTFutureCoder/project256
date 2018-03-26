@@ -1,7 +1,6 @@
-package essay
+package models
 
 import (
-	"project256/models"
 	"project256/util"
 	"fmt"
 	"time"
@@ -22,13 +21,13 @@ type EssayStruct struct {
 	Ext 		map[string]interface{}
 }
 
-func InsertEssay(essayData *map[string]interface{}) (string, error) {
+func (e *EssayStruct) InsertEssay(essayData *map[string]string) (string, error) {
 	user := util.GetUserInfo()
 	if user["status"] == util.STATUS_INVALID {
 		return "", errors.New(util.GetErrorMessage(util.ERROR_USER_UNAUTHORIZED))
 	}
 	essayId, err :=util.GenUUID32()
-	db := models.GetDbConn()
+	db := GetDbConn()
 	ret, err := db.Exec("INSERT INTO essay (essay_id, essay_title, essay_content, wish_id, status, create_user, create_time) VALUES (?,?,?,?,?,?,?)",
 			essayId,
 			(*essayData)["essay_title"],
@@ -46,8 +45,8 @@ func InsertEssay(essayData *map[string]interface{}) (string, error) {
 	return essayId, err
 }
 
-func GetListByUser(userId, limit, offset string) (*[]EssayStruct, error){
-	db := models.GetDbConn()
+func (e *EssayStruct) GetListByUser(userId string, limit, offset int) (*[]EssayStruct, error){
+	db := GetDbConn()
 	ret, err := db.Query("SELECT * FROM essay WHERE create_user=? ORDER BY id DESC LIMIT ? OFFSET ?",
 			userId,
 			limit,

@@ -1,7 +1,6 @@
-package feed
+package models
 
 import (
-	"project256/models"
 	"project256/util"
 	"fmt"
 	"time"
@@ -22,9 +21,9 @@ type FeedStruct struct {
 	Ext 		map[string]interface{}
 }
 
-func AddFeed(data *map[string]interface{}, dataType int) {
-	feedData := make(map[string]interface{})
-	feedData["feed_type"] = dataType
+func (f *FeedStruct) AddFeed(data *map[string]string, dataType int) {
+	feedData := make(map[string]string)
+	feedData["feed_type"] = string(dataType)
 	switch dataType {
 	case util.TYPE_ESSAY:
 		feedData["re_id"]	  = (*data)["essay_id"]
@@ -33,16 +32,16 @@ func AddFeed(data *map[string]interface{}, dataType int) {
 		feedData["re_id"]	  = (*data)["wish_id"]
 		feedData["feed_data"] = (*data)["wish_content"]
 	}
-	InsertFeed(&feedData)
+	f.InsertFeed(&feedData)
 }
 
-func InsertFeed(feedData *map[string]interface{}) (int64, error) {
+func (f *FeedStruct) InsertFeed(feedData *map[string]string) (int64, error) {
 	user := util.GetUserInfo()
 	if user["status"] == util.STATUS_INVALID {
 		return 0, errors.New(util.GetErrorMessage(util.ERROR_USER_UNAUTHORIZED))
 	}
 	feedId, err :=util.GenUUID32()
-	db := models.GetDbConn()
+	db := GetDbConn()
 	ret, err := db.Exec("INSERT INTO feed (feed_id, re_id, feed_data, feed_type, status, create_user, create_time) VALUES (?,?,?,?,?,?,?)",
 		feedId,
 		(*feedData)["re_id"],
@@ -60,14 +59,14 @@ func InsertFeed(feedData *map[string]interface{}) (int64, error) {
 	return row, err
 }
 
-func GetFeed(limit, offset string) (*[]FeedStruct, error){
+func (f *FeedStruct) GetFeed(limit, offset int) (*[]FeedStruct, error){
 	// 获取用户信息
 	_ = util.GetUserInfo()
 	// 获取用户关注的账号 1期不做
 	var userSubscribe []string
 	userSubscribe = append(userSubscribe, "1", "2")
 	// 转为逗号分隔 注意为空的情况
-	db := models.GetDbConn()
+	db := GetDbConn()
 	ret, err := db.Query(fmt.Sprintf("SELECT * FROM feed WHERE create_user IN (%s) ORDER BY id DESC LIMIT ? OFFSET ?",
 			"'" + strings.Join(userSubscribe, "','") + "'",
 		),
