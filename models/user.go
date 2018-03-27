@@ -1,7 +1,6 @@
 package models
 
 type UserStruct struct {
-
 }
 
 func (u *UserStruct) GetUserByIds(userIds []string) (map[string]interface{}, error) {

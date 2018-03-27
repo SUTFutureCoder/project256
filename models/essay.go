@@ -45,7 +45,7 @@ func (e *EssayStruct) InsertEssay(essayData *map[string]string) (string, error) 
 	return essayId, err
 }
 
-func (e *EssayStruct) GetListByUser(userId string, limit, offset int) (*[]EssayStruct, error){
+func (e *EssayStruct) GetListByUser(userId string, limit, offset int) ([]EssayStruct, error){
 	db := GetDbConn()
 	ret, err := db.Query("SELECT * FROM essay WHERE create_user=? ORDER BY id DESC LIMIT ? OFFSET ?",
 			userId,
@@ -75,5 +75,5 @@ func (e *EssayStruct) GetListByUser(userId string, limit, offset int) (*[]EssayS
 		essayDataList = append(essayDataList, essayData)
 	}
 
-	return &essayDataList, err
+	return essayDataList, err
 }

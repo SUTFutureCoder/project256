@@ -25,7 +25,7 @@ func (f *Feed) FeedList() (func(*gin.Context)) {
 		userIdsHash := make(map[string]bool)
 		var userIds []string
 		// 输出
-		for _, v := range *ret {
+		for _, v := range ret {
 			if userIdsHash[v.CreateUser] == false {
 				userIds = append(userIds, v.CreateUser)
 				userIdsHash[v.CreateUser] = true
@@ -33,10 +33,10 @@ func (f *Feed) FeedList() (func(*gin.Context)) {
 		}
 		// 回写
 		userInfoList, err := user.GetUserByIds(userIds)
-		for i := 0; i < len(*ret); i++ {
-			(*ret)[i].Ext = make(map[string]interface{})
-			if userInfoList[(*ret)[i].CreateUser] != false {
-				(*ret)[i].Ext["user_info"] = userInfoList[(*ret)[i].CreateUser]
+		for i := 0; i < len(ret); i++ {
+			ret[i].Ext = make(map[string]interface{})
+			if userInfoList[ret[i].CreateUser] != false {
+				ret[i].Ext["user_info"] = userInfoList[ret[i].CreateUser]
 			}
 		}
 

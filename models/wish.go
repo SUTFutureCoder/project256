@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log"
 	"fmt"
+	"strings"
 )
 
 type WishStruct struct {
@@ -72,4 +73,30 @@ func (w *WishStruct) GetListByUser(userId string) (*[]WishStruct, error){
 	}
 
 	return &wishDataList, err
+}
+
+func (w *WishStruct) GetWishByIds(wishIds []string) (map[string]WishStruct, error) {
+	var err error
+	db := GetDbConn()
+	ret, err := db.Query(fmt.Sprintf("SELECT * FROM wish WHERE wish_id IN (%s)",
+		"'" + strings.Join(wishIds, "','") + "'",
+	),
+	)
+	defer ret.Close()
+	if err != nil {
+		log.Fatal(fmt.Sprintf("Get Wish Error: %s", err))
+		return nil, err
+	}
+	// 初始化结构
+	var wishData WishStruct
+	wishDataList := make(map[string]WishStruct)
+	for ret.Next() {
+		err = ret.Scan(&wishData.Id, &wishData.WishId, &wishData.ParentWishId, &wishData.WishContent, &wishData.Status, &wishData.CreateUser, &wishData.CreateTime, &wishData.UpdateTime)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Scan Data Error: %s", err))
+			return nil, err
+		}
+		wishDataList[wishData.WishId] = wishData
+	}
+	return wishDataList, err
 }

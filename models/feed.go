@@ -59,7 +59,7 @@ func (f *FeedStruct) InsertFeed(feedData *map[string]string) (int64, error) {
 	return row, err
 }
 
-func (f *FeedStruct) GetFeed(limit, offset int) (*[]FeedStruct, error){
+func (f *FeedStruct) GetFeed(limit, offset int) ([]FeedStruct, error){
 	// 获取用户信息
 	_ = util.GetUserInfo()
 	// 获取用户关注的账号 1期不做
@@ -95,5 +95,5 @@ func (f *FeedStruct) GetFeed(limit, offset int) (*[]FeedStruct, error){
 		}
 		feedDataList = append(feedDataList, feedData)
 	}
-	return &feedDataList, err
+	return feedDataList, err
 }
