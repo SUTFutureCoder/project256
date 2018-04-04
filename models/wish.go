@@ -77,6 +77,9 @@ func (w *WishStruct) GetListByUser(userId string) (*[]WishStruct, error){
 
 func (w *WishStruct) GetWishByIds(wishIds []string) (map[string]WishStruct, error) {
 	var err error
+	if len(wishIds) == 0 {
+		return nil, err
+	}
 	db := GetDbConn()
 	ret, err := db.Query(fmt.Sprintf("SELECT * FROM wish WHERE wish_id IN (%s)",
 		"'" + strings.Join(wishIds, "','") + "'",

@@ -9,3 +9,7 @@ const TYPE_ESSAY = 1
 const TYPE_WISH = 2
 const TYPE_SUBSCRIBE = 3
 const TYPE_UNSUBSCRIBE = 4
+
+// 正文数据类型
+const CONTENT_TYPE_HTML = 0
+const CONTENT_TYPE_MARKDOWN = 1

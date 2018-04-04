@@ -13,6 +13,7 @@ type Essay struct {
 func (e *Essay) EssayList() (func(*gin.Context)) {
 	essay := new(models.EssayStruct)
 	wish  := new(models.WishStruct)
+	user  := new(models.UserStruct)
 	return func(c *gin.Context) {
 		// 获取用户id
 		userId := c.Param("user_id")
@@ -30,7 +31,14 @@ func (e *Essay) EssayList() (func(*gin.Context)) {
 			curpage = 1
 		}
 		var err error
-		ret, err := essay.GetListByUser(userId, perpage, (curpage - 1) * perpage)
+		ret := make(map[string]interface{})
+		essayList, err := essay.GetListByUser(userId, perpage, (curpage - 1) * perpage)
+		if err != nil {
+			util.Exception(c, util.ERROR_DB_SELECT, err.Error())
+			if c.IsAborted() {return}
+		}
+		count, err := essay.GetListCountByUser(userId)
+
 		if err != nil {
 			util.Exception(c, util.ERROR_DB_SELECT, err.Error())
 			if c.IsAborted() {return}
@@ -38,21 +46,71 @@ func (e *Essay) EssayList() (func(*gin.Context)) {
 		// 附加心愿数据
 		wishHash := make(map[string]bool)
 		var wishIds []string
-		for _, v := range ret {
+		// 附加用户数据
+		userHash := make(map[string]bool)
+		var userIds []string
+		for _, v := range essayList {
 			if wishHash[v.WishId] == false && v.WishId != "" {
 				wishIds = append(wishIds, v.WishId)
 				wishHash[v.WishId] = true
 			}
+			userIds = append(userIds, v.CreateUser)
+			userHash[v.CreateUser] = true
 		}
+
 		// 回写
 		wishInfoList, err := wish.GetWishByIds(wishIds)
-		for i := 0; i < len(ret); i++ {
-			ret[i].Ext = make(map[string]interface{})
-			if wishInfoList[ret[i].WishId].WishId != "" {
-				ret[i].Ext["wish_info"] = wishInfoList[ret[i].WishId]
+		userInfoList, err := user.GetUserByIds(userIds)
+		for i := 0; i < len(essayList); i++ {
+			essayList[i].Ext = make(map[string]interface{})
+			if wishInfoList[essayList[i].WishId].WishId != "" {
+				essayList[i].Ext["wish_info"] = wishInfoList[essayList[i].WishId]
 			}
+			essayList[i].Ext["user_info"] = userInfoList[essayList[i].CreateUser]
 		}
+
+		ret["count"] = count
+		ret["list"] = essayList
 		util.Output(c, ret)
+	}
+}
+
+func (e *Essay) EssayInfo() (func(*gin.Context)) {
+	essay := new(models.EssayStruct)
+	wish  := new(models.WishStruct)
+	user  := new(models.UserStruct)
+	return func(c *gin.Context) {
+		// 获取文章id
+		essayId := c.Param("essay_id")
+		if essayId == "" {
+			util.Exception(c, util.ERROR_PARAM_ERROR, "essayid不能为空")
+			if c.IsAborted() {return}
+		}
+		var err error
+		essayInfo, err := essay.GetInfo(essayId)
+		if err != nil {
+			util.Exception(c, util.ERROR_DB_SELECT, err.Error())
+			if c.IsAborted() {return}
+		}
+		if err != nil {
+			util.Exception(c, util.ERROR_DB_SELECT, err.Error())
+			if c.IsAborted() {return}
+		}
+		// 附加心愿数据
+		var wishIds []string
+		wishIds = append(wishIds, essayInfo.WishId)
+		// 附加用户数据
+		var userIds []string
+		userIds = append(userIds, essayInfo.CreateUser)
+		// 回写
+		wishInfoList, err := wish.GetWishByIds(wishIds)
+		userInfoList, err := user.GetUserByIds(userIds)
+		essayInfo.Ext = make(map[string]interface{})
+		if wishInfoList != nil && wishInfoList[essayInfo.WishId].WishId != "" {
+			essayInfo.Ext["wish_info"] = wishInfoList[essayInfo.WishId]
+		}
+		essayInfo.Ext["user_info"] = userInfoList[essayInfo.CreateUser]
+		util.Output(c, essayInfo)
 	}
 }
 
@@ -65,6 +123,7 @@ func (e *Essay) WriteEssay() (func(*gin.Context)) {
 		data["essay_title"], _ = c.GetPostForm("essay_title")
 		data["essay_content"], _ = c.GetPostForm("essay_content")
 		data["wish_id"] = c.DefaultPostForm("wish_id", "")
+		data["content_type"] = c.DefaultPostForm("content_type", "0")
 		if data["essay_title"] == "" {
 			util.Exception(c, util.ERROR_PARAM_ERROR, "文章标题不能为空")
 			if c.IsAborted() {return}

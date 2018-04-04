@@ -16,7 +16,8 @@ func main() {
 
 	essay := new(actions.Essay)
 	essayRouter := r.Group("/essay", actions.ActionBase())
-	essayRouter.GET("/list/:user_id",  essay.EssayList())
+	essayRouter.GET("/list/:user_id", essay.EssayList())
+	essayRouter.GET("/info/:essay_id", essay.EssayInfo())
 	essayRouter.POST("/write", essay.WriteEssay())
 
 	wish := new(actions.Wish)
