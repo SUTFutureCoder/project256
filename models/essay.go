@@ -29,7 +29,7 @@ func (e *EssayStruct) InsertEssay(essayData *map[string]string) (string, error) 
 	}
 	essayId, err :=util.GenUUID32()
 	db := GetDbConn()
-	ret, err := db.Exec("INSERT INTO essay (essay_id, essay_title, essay_content, content_type, wish_id, status, create_user, create_time) VALUES (?,?,?,?,?,?,?)",
+	ret, err := db.Exec("INSERT INTO essay (essay_id, essay_title, essay_content, content_type, wish_id, status, create_user, create_time) VALUES (?,?,?,?,?,?,?,?)",
 			essayId,
 			(*essayData)["essay_title"],
 			(*essayData)["essay_content"],
