@@ -9,8 +9,8 @@ func (u *UserStruct) GetUserByIds(userIds []string) (map[string]interface{}, err
 	userInfo := make(map[string]interface{})
 	userInfo["user_id"] = "1"
 	userInfo["user_name"] = "FutureCoder"
-	userInfo["user_sign"] = "To the Moon"
-	userInfo["user_avatar"] = "https://img.waimai.baidu.com/pc/4f9b4485fa524cd7df9ff89b3875de013a"
+	userInfo["user_sign"] = "Progressive Developer"
+	userInfo["user_avatar"] = "https://img.waimai.baidu.com/pc/0c65e42b51064007812b4988a0074438b9"
 	userInfo["status"]  = "1"
 	userInfoList["1"] = make(map[string]interface{})
 	userInfoList["1"] = userInfo
